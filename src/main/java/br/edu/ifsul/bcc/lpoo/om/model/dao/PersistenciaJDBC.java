@@ -29,7 +29,7 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
     private final String DRIVER = "org.postgresql.Driver";
     private final String USER = "postgres";
-    private final String SENHA = "postgres";
+    private final String SENHA = "Artur#13";
     public static final String URL = "jdbc:postgresql://localhost:5432/db_om_lpoo_20232";
     private Connection con = null;
 
@@ -166,15 +166,14 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
                 // insert em tb_cliente
                 PreparedStatement ps2 = this.con.prepareStatement("insert into tb_cliente (observacoes, cpf) values "
-                        + "(?, ?) returning observacoes");
+                        + "(?, ?)");
 
                 ps2.setString(1, c.getObservacoes());
                 ps2.setString(2, c.getCpf());
 
-                ResultSet rs = ps2.executeQuery();
+                ps2.execute();
 
-                if (rs.next()) {
-                    c.setObservacoes(rs.getString("observacoes"));
+                if (c.getVeiculo() != null) {
 
                     if (!c.getVeiculo().isEmpty()) {
 
@@ -191,8 +190,8 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                             ps3.close();
                         }
                     }
-                    rs.close();
                 }
+
                 ps2.close();
             } else {
                 PreparedStatement ps
@@ -207,9 +206,17 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
                 ps.setString(1, c.getCep());
                 ps.setString(2, c.getComplemento());
-                ps.setDate(3, new java.sql.Date(c.getData_nascimento().getTimeInMillis()));
+                try {
+                    ps.setDate(3, new java.sql.Date(c.getData_nascimento().getTimeInMillis()));
+                } catch (Exception e) {
+                    ps.setDate(3, null);
+                }
                 ps.setString(4, c.getNome());
-                ps.setString(5, c.getNumero());
+                try {
+                    ps.setString(5, c.getNumero());
+                } catch (Exception e) {
+                    ps.setString(5, null);
+                }
                 ps.setString(6, c.getSenha());
                 ps.setString(7, c.getCpf());
 
@@ -229,22 +236,23 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                 ps.setString(1, c.getCpf());
                 ps.execute();
                 ps.close();
+                if (c.getVeiculo() != null) {
+                    if (!c.getVeiculo().isEmpty()) {
 
-                if (!c.getVeiculo().isEmpty()) {
+                        for (Veiculo v : c.getVeiculo()) {
 
-                    for (Veiculo v : c.getVeiculo()) {
+                            ps = this.con.prepareStatement("insert into tb_cliente_veiculo "
+                                    + "(cliente_cpf, veiculo_id) "
+                                    + "values "
+                                    + "(?, ?)");
+                            ps.setString(1, c.getCpf());
+                            ps.setString(2, v.getPlaca());
 
-                        ps = this.con.prepareStatement("insert into tb_cliente_veiculo "
-                                + "(cliente_cpf, veiculo_id) "
-                                + "values "
-                                + "(?, ?)");
-                        ps.setString(1, c.getCpf());
-                        ps.setString(2, v.getPlaca());
+                            ps.execute();
+                            ps.close();
+                        }
 
-                        ps.execute();
-                        ps.close();
                     }
-
                 }
 
             }
@@ -352,14 +360,17 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
             //verificar a acao: insert ou update.
             if (func.getData_admmissao() == null) {
-
                 //insert tb_pessoa
                 PreparedStatement ps
                         = this.con.prepareStatement("insert into tb_pessoa (tipo,cpf,data_nascimento,nome,senha) values "
                                 + "('F',?,?,?,?)");
 
                 ps.setString(1, func.getCpf());
-                ps.setDate(2, new java.sql.Date(func.getData_nascimento().getTimeInMillis()));
+                try {
+                    ps.setDate(2, new java.sql.Date(func.getData_nascimento().getTimeInMillis()));
+                } catch (Exception e) {
+                    ps.setDate(2, null);
+                }
                 ps.setString(3, func.getNome());
                 ps.setString(4, func.getSenha());
 
@@ -372,13 +383,13 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                 PreparedStatement ps2
                         = this.con.prepareStatement("insert into tb_funcionario values "
                                 + "(now(), null, ?, ?, ?) returning data_admmissao");
-                System.out.println("passou2");
                 ps2.setString(1, func.getNumero_ctps());
                 ps2.setString(2, func.getCpf());
                 ps2.setInt(3, func.getCargo().getId());
                 //setar os parametros...
 
                 ResultSet rs2 = ps2.executeQuery();
+                System.out.println("passou2");
 
                 if (rs2.next()) {
 
@@ -678,9 +689,9 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                 // update em tb_pagamento
                 PreparedStatement ps = this.con.prepareStatement("update tb_pagamento set data_pagamento = ? "
                         + "where id = ?");
-                try{
+                try {
                     ps.setDate(1, new java.sql.Date(p.getData_pagamento().getTimeInMillis()));
-                }catch(Exception e){
+                } catch (Exception e) {
                     Calendar dt = Calendar.getInstance();
                     ps.setDate(1, new java.sql.Date(dt.getTimeInMillis()));
                 }
@@ -749,7 +760,11 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                         + "valor = ?, "
                         + "equipe_id = ?, "
                         + "orcamento_id = ? where id = ?");
-                ps.setDate(1, new java.sql.Date(s.getData_fim().getTimeInMillis()));
+                try {
+                    ps.setDate(1, new java.sql.Date(s.getData_fim().getTimeInMillis()));
+                } catch (Exception e) {
+                    ps.setDate(1, null);
+                }
                 ps.setString(2, s.getStatus().toString());
                 ps.setFloat(3, s.getValor());
                 ps.setInt(4, s.getEquipe().getId());
@@ -780,11 +795,16 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
             } else {
                 // update em tb_veiculo
-                PreparedStatement ps = this.con.prepareStatement("update tb_veiculo set data_ultimo_servico = ? where "
-                        + "placa = ?");
-                ps.setDate(1, new java.sql.Date(v.getData_ultimo_servico().getTimeInMillis()));
-                ps.setString(2, v.getPlaca());
-                ps.execute();
+                PreparedStatement ps = this.con.prepareStatement("update tb_veiculo set data_ultimo_servico = now() where "
+                        + "placa = ? returning data_ultimo_servico");
+               
+                    Calendar dt = Calendar.getInstance();
+                    ps.setString(1, v.getPlaca());
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()){
+                        dt.setTimeInMillis(rs.getDate("data_ultimo_servico").getTime());
+                        v.setData_ultimo_servico(dt);
+                    }
                 ps.close();
             }
         }
@@ -794,22 +814,224 @@ public class PersistenciaJDBC implements InterfacePersistencia {
     @Override
     public void remover(Object o) throws Exception {
 
-        if (o instanceof Cargo) {
+        if(o instanceof Cargo){
             Cargo crg = (Cargo) o;
-
-            PreparedStatement ps = this.con.prepareStatement("delete from "
-                    + "tb_cargo where id = ?;");
-            //definir os valores para os parametros
+            
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_funcionario where "
+                                                            + "id = ?");
             ps.setInt(1, crg.getId());
             ps.execute();
             ps.close();
+            
+            ps = this.con.prepareStatement("delete from "
+                        + "tb_cargo where id = ?;");
+                //definir os valores para os parametros
+            ps.setInt(1, crg.getId());
+            ps.execute();
+            ps.close();
+                
+           
+        }else if(o instanceof Cliente){
+            Cliente c = (Cliente) o;
+            
+            PreparedStatement ps = this.con.prepareStatement("delete from "
+                                                + "tb_cliente_veiculo where "
+                                                + "cliente_cpf = ?");
+            ps.setString(1, c.getCpf());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_orcamento where "
+                                        + "cliente_cpf = ?");
+            ps.setString(1, c.getCpf());
+            ps.execute();
+            ps.close();
+            
+            
+            ps = this.con.prepareStatement("delete from "
+                                            + "tb_cliente where cpf = ?");
+            ps.setString(1, c.getCpf());
+            ps.execute();
+            ps.close();
+            
+            
+            ps = this.con.prepareStatement("delete from "
+                                            + "tb_pessoa where cpf = ?");
+            ps.setString(1, c.getCpf());
+            ps.execute();
+            ps.close();
+        
+        }else if (o instanceof Curso){
+            Curso c = (Curso) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_funcionario_curso "
+                                                            + "where curso_id = ?");
+            ps.setInt(1, c.getId());
+            ps.execute();
+            ps.close();
+            
+            
+            ps = this.con.prepareStatement("delete from tb_curso "
+                                        + "where id = ?");
+            ps.setInt(1, c.getId());
+            ps.execute();
+            ps.close();
 
-        } else if (o instanceof Funcionario) {
-
-            //remove os respectivos registro na tabela associativa
-            //remover em tb_funcionario
-        } else {
-
+        }else if (o instanceof Equipe){
+            Equipe e = (Equipe) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_equipe_funcionario "
+                                                        + "where equipe_id = ?");
+            ps.setInt(1, e.getId());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_servico where "
+                                        + "equipe_id = ?");
+            ps.setInt(1, e.getId());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_equipe"
+                                        + "where id = ?");
+            ps.setInt(1, e.getId());
+            ps.execute();
+            ps.close();
+        
+        }else if(o instanceof Funcionario){
+            Funcionario func = (Funcionario) o;        
+            
+            //remoção da tb_equipe_funcionario
+            PreparedStatement ps = this.con.prepareStatement("delete from "
+                                                + "tb_equipe_funcionario where funcionario_cpf = ?");
+            ps.setString(1, func.getCpf());     // seta o valor para '?'
+            ps.execute();       // executa
+            ps.close();         // fecha o cursor
+            
+            ps = this.con.prepareStatement("delete from tb_orcamento where "
+                                        + "funcionario_cpf = ?");
+            ps.setString(1, func.getCpf());
+            ps.execute();
+            ps.close();
+            
+            // remoção da tb_funcionario_curso
+            ps = this.con.prepareStatement("delete from "
+                                        + "tb_funcionario_curso where funcionario_cpf = ?");
+            ps.setString(1, func.getCpf());     // seta o valor para '?'
+            ps.execute();   // executa
+            ps.close();     // fecha o cursor
+            
+            
+            //remoção da tb_funcionario
+            ps = this.con.prepareStatement("delete from "
+                                            + "tb_funcionario where cpf = ?");
+            ps.setString(1, func.getCpf());     // seta o valor para '?'
+            ps.execute();   // executa
+            ps.close();     // fecha o cursor
+            
+            // remoção da tb_pessoa
+            ps = this.con.prepareStatement("delete from "
+                                        + "tb_pessoa where cpf = ?");
+            ps.setString(1, func.getCpf());     // seta o valor para '?'
+            ps.execute();       // executa
+            ps.close();         // fecha o cursor
+            
+        }else if (o instanceof MaoObra){
+            MaoObra m = (MaoObra) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_orcamento_maoobra "
+                                                        + "where maoobra_id = ?");
+            ps.setString(1, m.getId());
+            ps.execute();
+            ps.close();
+                        
+            ps = this.con.prepareStatement("delete from tb_maoobra "
+                                        + "where id = ?");
+            ps.setString(1, m.getId());
+            ps.execute();
+            ps.close();
+            
+        }else if (o instanceof Orcamento){
+            Orcamento or = (Orcamento) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_orcamento_maoobra "
+                                                        + "where orcamento_id = ?");
+            ps.setInt(1, or.getId());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_servico where "
+                                        + "orcamento_id = ?");
+            ps.setInt(1, or.getId());
+            ps.execute();
+            ps.close();
+            
+            
+            ps = this.con.prepareStatement("delete from tb_orcamento_peca "
+                                            + "where orcamento_id = ?");
+            ps.setInt(1, or.getId());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_orcamento "
+                                            + "where id = ?");
+            ps.setInt(1, or.getId());
+            ps.execute();
+            ps.close();
+            
+        }else if (o instanceof Pagamento){
+            Pagamento p = (Pagamento) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_pagamento "
+                                                        + "where id = ?");
+            ps.setInt(1, p.getId());
+            ps.execute();
+            ps.close();
+                    
+        }else if (o instanceof Peca){
+            Peca p = (Peca) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_orcamento_peca "
+                                                        + "where peca_id = ?");
+            ps.setInt(1, p.getId());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_peca "
+                                            + "where id = ?");
+            ps.setInt(1, p.getId());
+            ps.execute();
+            ps.close();
+        
+        }else if (o instanceof Servico){
+            Servico s = (Servico) o;
+            
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_pagamento "
+                                                            + "where servico_id = ?");
+            ps.setInt(1, s.getId());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_servico "
+                                                            + "where id = ?");
+            ps.setInt(1, s.getId());
+            ps.execute();
+            ps.close();
+        
+        }else if (o instanceof Veiculo){
+            Veiculo v = (Veiculo) o;
+            PreparedStatement ps = this.con.prepareStatement("delete from tb_cliente_veiculo "
+                                                            + "where veiculo_id = ?");
+            ps.setString(1, v.getPlaca());
+            ps.execute();
+            ps.close();
+            
+            ps = this.con.prepareStatement("delete from tb_orcamento where "
+                                            + "where veiculo_id = ?");
+            ps.setString(1, v.getPlaca());
+            ps.execute();
+            ps.close();
+                        
+            ps = this.con.prepareStatement("delete from tb_veiculo "
+                                            + "where placa = ?");
+            ps.setString(1, v.getPlaca());
+            ps.execute();
+            ps.close();
+            
         }
 
     }

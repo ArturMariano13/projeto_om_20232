@@ -11,10 +11,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-/**
- *
- * @author telmo
- */
 @Entity
 @Table(name = "tb_cliente")
 @DiscriminatorValue(value = "C")
@@ -31,6 +27,7 @@ public class Cliente extends Pessoa{
 
     public Cliente() {
         veiculo = new ArrayList();
+        observacoes = " ";
     }
 
     /**

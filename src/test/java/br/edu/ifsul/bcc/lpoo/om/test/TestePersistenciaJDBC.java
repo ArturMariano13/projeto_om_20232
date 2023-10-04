@@ -115,11 +115,13 @@ public class TestePersistenciaJDBC {
         PersistenciaJDBC jdbc = new PersistenciaJDBC();
         if (jdbc.conexaoAberta()){
             
+            // TESTE EQUIPE
             Equipe e = new Equipe();
+            e.setId(1);
             e.setEspecialidades("teste");
             e.setNome("apertador de parafuso");
             jdbc.persist(e);
-
+            
             Servico s = new Servico();
             s.setEquipe(e);
             
@@ -127,16 +129,25 @@ public class TestePersistenciaJDBC {
             o.setObservacoes("teste");
             
             Cliente cli = new Cliente();
-            cli.setCpf("4444");
+            cli.setCpf("3");
+            cli.setNome("Artur");
+            cli.setSenha("11111");
+            jdbc.persist(cli);
             o.setCliente(cli);
             
             Funcionario func = new Funcionario();
-            func.setCpf("11111");
+            func.setCpf("1111111111");
             func.setNumero_ctps("1234");
+            func.setNome("Toninho");
+            func.setSenha("123456");
+            Cargo cargo = new Cargo();
+            cargo.setId(1);
+            func.setCargo(cargo);
+            jdbc.persist(func);
             o.setFuncionario(func);
             
             Veiculo v = new Veiculo();
-            v.setPlaca("2222");
+            v.setPlaca("IWI9J98");
             v.setAno(2010);
             o.setVeiculo(v);
             jdbc.persist(o);
@@ -190,6 +201,36 @@ public class TestePersistenciaJDBC {
         }
     }
     
+    @Test
+    public void testOrcamento() throws Exception{
+        PersistenciaJDBC jdbc = new PersistenciaJDBC();
+        if (jdbc.conexaoAberta()){
+            Orcamento o = new Orcamento();
+            Cliente cli = new Cliente();
+            cli.setCpf("2");
+            o.setCliente(cli);
+            Funcionario func = new Funcionario();
+            func.setCpf("1233");
+            o.setFuncionario(func);
+            MaoObra m = new MaoObra();
+            m.setId("1");
+            Collection<MaoObra> maos = new ArrayList();
+            maos.add(m);
+            o.setMaoobras(maos);
+            Peca p = new Peca();
+            p.setId(1);
+            Collection<Peca> pecas = new ArrayList();
+            pecas.add(p);
+            o.setPecas(pecas);
+            Veiculo v = new Veiculo();
+            v.setPlaca("IWI9J98");
+            o.setVeiculo(v);
+            jdbc.persist(o);
+            
+            
+        }
+    }
+    
     //@Test
     public void testCargo() throws Exception{
         PersistenciaJDBC jdbc = new PersistenciaJDBC();
@@ -212,7 +253,7 @@ public class TestePersistenciaJDBC {
         if (jdbc.conexaoAberta()){
             
             Peca p = new Peca();
-            p.setId(1);
+            //p.setId(1);
             p.setFornecedor("Pirelli");
             p.setNome("Roda aro 12");
             p.setValor(250.0f);
@@ -225,7 +266,7 @@ public class TestePersistenciaJDBC {
         }
     }
     
-    @Test
+    //@Test
     public void testPagamento() throws Exception{
         PersistenciaJDBC jdbc = new PersistenciaJDBC();
         if (jdbc.conexaoAberta()){

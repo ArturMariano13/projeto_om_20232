@@ -59,6 +59,7 @@ public abstract class Pessoa implements Serializable {
     private String tipo;
 
     public Pessoa() {
+        
     }
 
     /**
