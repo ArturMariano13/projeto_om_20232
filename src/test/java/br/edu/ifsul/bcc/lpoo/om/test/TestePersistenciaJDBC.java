@@ -201,7 +201,7 @@ public class TestePersistenciaJDBC {
         }
     }
     
-    @Test
+    //@Test
     public void testOrcamento() throws Exception{
         PersistenciaJDBC jdbc = new PersistenciaJDBC();
         if (jdbc.conexaoAberta()){

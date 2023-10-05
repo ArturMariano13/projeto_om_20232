@@ -9,6 +9,7 @@ import br.edu.ifsul.bcc.lpoo.om.model.MaoObra;
 import br.edu.ifsul.bcc.lpoo.om.model.Orcamento;
 import br.edu.ifsul.bcc.lpoo.om.model.Pagamento;
 import br.edu.ifsul.bcc.lpoo.om.model.Peca;
+import br.edu.ifsul.bcc.lpoo.om.model.Pessoa;
 import br.edu.ifsul.bcc.lpoo.om.model.Servico;
 import br.edu.ifsul.bcc.lpoo.om.model.Veiculo;
 import java.sql.Connection;
@@ -84,9 +85,108 @@ public class PersistenciaJDBC implements InterfacePersistencia {
             rs.close();
 
         } else if (c == Curso.class) {
+            PreparedStatement ps = this.con.prepareStatement("select id, descricao "
+                                                        + "from tb_curso where id = ?");
+            ps.setInt(1, Integer.valueOf(id.toString()));
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next()){
+                Curso crs = new Curso();
+                crs.setId(rs.getInt("id"));
+                crs.setDescricao(rs.getString("descricao"));
+                ps.close();
+                return crs;
+            }
 
-        } else if (c == Funcionario.class) {
-
+        } else if (c == Pessoa.class) {
+            PreparedStatement ps = this.con.prepareStatement("select from tb_pessoa tipo, cpf, cep, complemento, data_nascimento, nome, numero, senha "
+                                                        + "where cpf = ?");
+            ps.setString(1, id.toString());
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()){
+                
+                if (rs.getString("tipo").equals("F")){
+                    Funcionario func = new Funcionario();
+                    func.setTipo("F");
+                    func.setCpf(rs.getString("cpf"));
+                    func.setCep(rs.getString("cep"));
+                    func.setComplemento(rs.getString("complemento"));
+                    
+                    Calendar dt = Calendar.getInstance();
+                    dt.setTimeInMillis(rs.getDate("data_nascimento").getTime());
+                    func.setData_nascimento(dt);
+                    
+                    func.setNome(rs.getString("nome"));
+                    func.setNumero(rs.getString("numero"));
+                    func.setSenha(rs.getString("senha"));
+                    
+                    PreparedStatement ps2 = this.con.prepareStatement("select data_admmissao, data_demissao, numero_ctps, cargo_id from "
+                            + "tb_funcionario where cpf = ?");
+                    
+                    ps2.setString(1, id.toString());
+                    
+                    ResultSet rs2 = ps2.executeQuery();
+                    
+                    if (rs2.next()){
+                        dt.setTimeInMillis(rs2.getDate("data_admmissao").getTime());
+                        func.setData_admmissao(dt);
+                        dt.setTimeInMillis(rs2.getDate("data_demissao").getTime());
+                        func.setData_demissao(dt);
+                        func.setNumero_ctps(rs2.getString("numero_ctps"));
+                        
+                        PreparedStatement ps3 = this.con.prepareStatement("select id, descricao from tb_cargo "
+                                            + "where id = ?");
+                        
+                        ps3.setInt(1, rs2.getInt("cargo_id"));
+                        
+                        ResultSet rs3 = ps3.executeQuery();
+                        
+                        if (rs3.next()){
+                            Cargo crg = new Cargo();
+                            crg.setId(rs3.getInt("id"));
+                            crg.setDescricao(rs3.getString("descricao"));
+                            func.setCargo(crg);
+                            ps3.close();
+                        }
+                          
+                        ps2.close();
+                        return func;
+                    }
+                
+                }else if (rs.getString("tipo").equals("C")){
+                    Cliente cli = new Cliente();
+                    cli.setTipo("C");
+                    cli.setCpf(rs.getString("cpf"));
+                    cli.setCep(rs.getString("cep"));
+                    cli.setComplemento(rs.getString("complemento"));
+                    
+                    Calendar dt = Calendar.getInstance();
+                    dt.setTimeInMillis(rs.getDate("data_nascimento").getTime());
+                    cli.setData_nascimento(dt);
+                    
+                    cli.setNome(rs.getString("nome"));
+                    cli.setNumero(rs.getString("numero"));
+                    cli.setSenha(rs.getString("senha"));
+                    
+                    PreparedStatement ps2 = this.con.prepareStatement("select observacoes from "
+                            + "tb_cliente where cpf = ?");
+                    
+                    ps2.setString(1, id.toString());
+                    
+                    ResultSet rs2 = ps2.executeQuery();
+                    
+                    if (rs2.next()){
+                        cli.setObservacoes(rs2.getString("observacoes"));
+                          
+                        ps2.close();
+                        return cli;
+                    }
+                }
+                
+            }
             //select em tb_funcionario
             //select na tabela associativa.
         } else if (c == Veiculo.class) {
@@ -1068,24 +1168,44 @@ public class PersistenciaJDBC implements InterfacePersistencia {
     public Collection<Funcionario> listFuncionarios() throws Exception {
         Collection<Funcionario> colecaoRetorno = null;
 
-        PreparedStatement ps = this.con.prepareStatement("");
+        PreparedStatement ps = this.con.prepareStatement("select * from tb_pessoa where tipo = 'F'");
         ResultSet rs = ps.executeQuery();//executa o sql e retorna
-
-        colecaoRetorno = new ArrayList();//inicializa a collecao
-
-        while (rs.next()) {//percorre o ResultSet
+        
+        PreparedStatement ps3 = this.con.prepareStatement("select * from tb_funcionario");
+        ResultSet rs3 = ps3.executeQuery();
+        
+        colecaoRetorno = new ArrayList();//inicializa a colecao
+        
+        while (rs.next() && rs3.next()) {//percorre o ResultSet
 
             Funcionario func = new Funcionario();//inicializa o Cargo
+            //func.setCargo();
+            func.setCep(rs.getString("cep"));
+            func.setComplemento(rs.getString("complemento"));
+            func.setCpf(rs.getString("cpf"));
+            //func.setData_nascimento(data_nascimento); // AJUSTAR
+            func.setNome(rs.getString("nome"));
+            func.setNumero(rs.getString("numero"));
+            func.setSenha(rs.getString("senha"));
+            //func.setData_admmissao(rs3.getDate("data_admmissao"));    // AJUSTAR
+            func.setNumero_ctps(rs3.getString("numero_ctps"));
+            
             //seta as informações do rs
-            PreparedStatement ps2 = this.con.prepareStatement("selecte ... from tb_funcionario_cur");
-            ResultSet rs2 = ps.executeQuery();//executa o sql e retorna
+            PreparedStatement ps2 = this.con.prepareStatement("select funcionario_cpf, curso_id from tb_funcionario_curso fc, tb_pessoa f, tb_curso c "
+                                                            + "where fc.funcionario_cpf = ?");
+            ps2.setString(1, rs.getString("cpf"));
+            ResultSet rs2 = ps2.executeQuery();//executa o sql e retorna
             Collection<Curso> colecaoCursos = new ArrayList();
             while (rs2.next()) {
                 Curso crs = new Curso();
-
+                crs.setId(rs2.getInt("id"));
+                crs.setDescricao("descricao");
+                
                 colecaoCursos.add(crs);
             }
-            rs2.close();
+            
+            ps2.close();
+            ps3.close();
 
             func.setCursos(colecaoCursos);
 
