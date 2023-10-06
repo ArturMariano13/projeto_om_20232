@@ -45,6 +45,10 @@ public abstract class Pessoa implements Serializable {
     
     @Column(nullable = true, length = 100)
     private String complemento;
+    
+    //transient significa que não será persistido pelo jpa
+    @Transient
+    private String tipo;
 
     public String getTipo() {
         return tipo;
@@ -54,10 +58,6 @@ public abstract class Pessoa implements Serializable {
         this.tipo = tipo;
     }
     
-    //transient significa que não será persistido pelo jpa
-    @Transient
-    private String tipo;
-
     public Pessoa() {
         
     }
