@@ -3,7 +3,7 @@ package br.edu.ifsul.bcc.lpoo.om.model;
 
 /**
  *
- * @author telmo
+ * @author arturmariano
  */
 public enum StatusServico {
     

@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 
 /**
  *
- * @author telmo
+ * @author arturmariano
  */
 @Entity
 @Table(name = "tb_pessoa")

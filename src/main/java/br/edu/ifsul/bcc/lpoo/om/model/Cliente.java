@@ -52,6 +52,13 @@ public class Cliente extends Pessoa{
         this.veiculo = veiculo;
     }
     
+    public void adicionarVeiculo(Veiculo veiculo){
+        if (this.veiculo == null){
+            this.veiculo = new ArrayList();
+        }
+        this.veiculo.add(veiculo);
+    }
+    
     
     
 }

@@ -24,7 +24,7 @@ import java.util.Collection;
 
 /**
  *
- * @author telmo
+ * @author arturmariano
  */
 public class PersistenciaJDBC implements InterfacePersistencia {
 

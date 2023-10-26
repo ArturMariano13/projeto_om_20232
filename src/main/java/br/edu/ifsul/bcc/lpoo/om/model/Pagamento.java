@@ -17,7 +17,7 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author telmo
+ * @author arturmariano
  */
 @Entity
 @Table(name = "tb_pagamento")

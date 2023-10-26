@@ -15,8 +15,10 @@ import javax.persistence.TemporalType;
 
 /**
  *
- *  ALTERAÇÃO DE STRING PARA INTEGER O ID --> NÃO FUNCIONA A SEQUÊNCIA COM STRING 
+ *  author arturmariano
  */
+
+//ALTERAÇÃO DE STRING PARA INTEGER O ID --> NÃO FUNCIONA A SEQUÊNCIA COM STRING 
 @Entity
 @Table(name = "tb_maoobra")
 public class MaoObra implements Serializable{

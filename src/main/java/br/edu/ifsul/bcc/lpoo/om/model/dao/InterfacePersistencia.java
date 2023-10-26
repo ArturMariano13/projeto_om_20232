@@ -8,7 +8,7 @@ import java.util.Collection;
 
 /**
  *
- * @author telmo
+ * @author arturmariano
  */
 public interface InterfacePersistencia {
     
