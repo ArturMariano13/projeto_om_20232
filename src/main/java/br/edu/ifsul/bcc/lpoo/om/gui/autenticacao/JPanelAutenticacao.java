@@ -19,12 +19,13 @@ import javax.swing.border.LineBorder;
  *
  * @author arturmariano
  */
+
 public class JPanelAutenticacao extends JPanel implements ActionListener{
     
     private Controle controle;
     private JLabel lblCPF;
     private JLabel lblSenha;
-    private JTextField txtCPF;
+    private JTextField txfCPF;
     private JPasswordField psfSenha;
     private JButton btnLogar;
     private Border defaultBorder;
@@ -32,7 +33,7 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
     private GridBagLayout gridLayout;   // gerenciador de layout
     private GridBagConstraints posicionador;
     
-    public JPanelAutenticacao(){
+    public JPanelAutenticacao(Controle controle){
         this.controle = controle;
         initComponents();
     }
@@ -45,19 +46,19 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
         lblCPF = new JLabel("CPF: ");
         lblCPF.setToolTipText("lblCPF");    // acessibilidade
         posicionador = new GridBagConstraints();
-        posicionador.gridy = 0;     // posição da linha (vertical)
-        posicionador.gridx = 0;     // posição da coluna (horizontal)
+        posicionador.gridy = 0;     // posição da coluna (vertical)
+        posicionador.gridx = 0;     // posição da linha (horizontal)
         this.add(lblCPF, posicionador);     // o "add" adiciona o rótulo no painel
         
-        txtCPF = new JTextField(10);
-        txtCPF.setFocusable(true);      // acessibilidade
-        txtCPF.setToolTipText("txtCPF");    // acessibilidade
+        txfCPF = new JTextField(10);
+        txfCPF.setFocusable(true);      // acessibilidade -> já sai selecionado
+        txfCPF.setToolTipText("txtCPF");    // acessibilidade
         //Util.considerarEnterComoTab(txfCPF);
         posicionador = new GridBagConstraints();
-        posicionador.gridy = 0;     // posição da linha (vertical)
-        posicionador.gridx = 1;     // posição da coluna (horizontal)
-        defaultBorder = txtCPF.getBorder();
-        this.add(txtCPF, posicionador);
+        posicionador.gridy = 0;     // posição da coluna (vertical)
+        posicionador.gridx = 1;     // posição da linha (horizontal)
+        defaultBorder = txfCPF.getBorder();
+        this.add(txfCPF, posicionador);
         
         lblSenha = new JLabel("Senha: ");
         lblSenha.setToolTipText("lblSenha");
@@ -80,28 +81,34 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
         btnLogar.setToolTipText("btnLogar");
         //Util.registraEnterNoBotao(btnLogar);
         posicionador = new GridBagConstraints();
-        posicionador.gridy = 2;//policao da linha (vertical)
-        posicionador.gridx = 1;// posição da coluna (horizontal)
+        posicionador.gridy = 2;//policao da coluna (vertical)
+        posicionador.gridx = 1;// posição da linha (horizontal)
         btnLogar.addActionListener(this);   // registrar o botão no Listener
         btnLogar.setActionCommand("comando_autenticar");
         this.add(btnLogar, posicionador);
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
+        
+        // validação do formulário (cpf e senha)
+        // acionar o método para realizar a autenticação
+        
+        System.out.println("Clicou no botão: " + ae.getActionCommand());
+
         //testa para verificar se o botão btnLogar foi clicado.
-        if(e.getActionCommand().equals(btnLogar.getActionCommand())){
+        if(ae.getActionCommand().equals(btnLogar.getActionCommand())){
 
             //validacao do formulario.
-            if(txtCPF.getText().trim().length() == 11){
+            if(txfCPF.getText().trim().length() == 11){
 
-                txtCPF.setBorder(new LineBorder(Color.green,1));
+                txfCPF.setBorder(new LineBorder(Color.green,1));
 
                 if(new String(psfSenha.getPassword()).trim().length() >= 3 ){
 
                     psfSenha.setBorder(new LineBorder(Color.green,1));
 
-                    controle.autenticar(txtCPF.getText().trim(), new String(psfSenha.getPassword()).trim());
+                    controle.autenticar(txfCPF.getText().trim(), new String(psfSenha.getPassword()).trim());
 
                 }else {
 
@@ -114,12 +121,12 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
             }else{
 
                 JOptionPane.showMessageDialog(this, "Informe CPf com 11 dígitos", "Autenticação", JOptionPane.ERROR_MESSAGE);                    
-                txtCPF.setBorder(new LineBorder(Color.red,1));
-                txtCPF.requestFocus();
+                txfCPF.setBorder(new LineBorder(Color.red,1));
+                txfCPF.requestFocus();
             }
                                       
             
-        } 
+        }
     }
     
 }

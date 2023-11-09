@@ -22,4 +22,6 @@ public interface InterfacePersistencia {
     public Collection<Funcionario> listFuncionarios() throws Exception;
     public Collection<Cliente> listClientes() throws Exception;
     
+    public Funcionario doLogin(String cpf, String senha) throws Exception;
+    
 }
