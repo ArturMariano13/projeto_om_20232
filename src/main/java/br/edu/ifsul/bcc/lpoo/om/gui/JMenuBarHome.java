@@ -69,7 +69,7 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
         menuCadastro.add(menuItemFuncionario);  
         
         menuItemFuncionarioDesigner = new JMenuItem("Funcionario (Designer)");
-        menuItemFuncionarioDesigner.setToolTipText("Funcionario (Desinger)"); //acessibilidade
+        menuItemFuncionarioDesigner.setToolTipText("Funcionario (Designer)"); //acessibilidade
         menuItemFuncionarioDesigner.setFocusable(true); //acessibilidade
         
                    

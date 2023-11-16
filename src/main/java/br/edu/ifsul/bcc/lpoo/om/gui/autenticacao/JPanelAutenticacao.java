@@ -2,10 +2,13 @@ package br.edu.ifsul.bcc.lpoo.om.gui.autenticacao;
 
 import br.edu.ifsul.bcc.lpoo.om.Controle;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -40,6 +43,10 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
     
     private void initComponents(){
        
+        this.setBackground(new Color(240, 240, 240));
+        
+        
+        
         gridLayout = new GridBagLayout();   // inicialização do gerenciador de layout
         this.setLayout(gridLayout);     // define o gerenciador desse painel
         
@@ -48,7 +55,10 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
         posicionador = new GridBagConstraints();
         posicionador.gridy = 0;     // posição da coluna (vertical)
         posicionador.gridx = 0;     // posição da linha (horizontal)
+        lblCPF.setFont(new Font("Serif", Font.BOLD, 14));      
         this.add(lblCPF, posicionador);     // o "add" adiciona o rótulo no painel
+        
+        
         
         txfCPF = new JTextField(10);
         txfCPF.setFocusable(true);      // acessibilidade -> já sai selecionado
@@ -57,6 +67,14 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
         posicionador = new GridBagConstraints();
         posicionador.gridy = 0;     // posição da coluna (vertical)
         posicionador.gridx = 1;     // posição da linha (horizontal)
+        
+        txfCPF.setFont(new Font("Serif", Font.PLAIN, 12));
+        txfCPF.setForeground(new Color(30, 30, 30)); // Cor do texto
+        txfCPF.setBackground(new Color(213, 253, 224)); // Cor de fundo
+        // Adiciona uma borda ao redor do campo de texto
+        Border textFieldBorder = BorderFactory.createLineBorder(new Color(100, 100, 100), 1);
+        txfCPF.setBorder(textFieldBorder);
+        
         defaultBorder = txfCPF.getBorder();
         this.add(txfCPF, posicionador);
         
@@ -65,12 +83,17 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
         posicionador = new GridBagConstraints();
         posicionador.gridy = 1;
         posicionador.gridx = 0;
+        lblSenha.setFont(new Font("Serif", Font.BOLD, 14));      
         this.add(lblSenha, posicionador);
-        
         psfSenha = new JPasswordField(10);
         psfSenha.setFocusable(true);
         psfSenha.setToolTipText("psfSenha");
+        psfSenha.setBorder(textFieldBorder);
         //Util.considerarEnterComoTab(psfSenha);
+        psfSenha.setFont(new Font("Serif", Font.PLAIN, 12));
+        psfSenha.setForeground(new Color(30,30,30));
+        psfSenha.setBackground(new Color(213,253,224));
+        
         posicionador = new GridBagConstraints();
         posicionador.gridy = 1;
         posicionador.gridx = 1;
@@ -79,6 +102,7 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
         btnLogar = new JButton("Autenticar");
         btnLogar.setFocusable(true);
         btnLogar.setToolTipText("btnLogar");
+        btnLogar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         //Util.registraEnterNoBotao(btnLogar);
         posicionador = new GridBagConstraints();
         posicionador.gridy = 2;//policao da coluna (vertical)

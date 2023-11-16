@@ -72,7 +72,7 @@ public class PersistenciaJDBC implements InterfacePersistencia {
         PreparedStatement ps = 
             this.con.prepareStatement("select p.cpf, to_char(p.data_nascimento, 'dd/mm/yyyy') as data_nascimento, p.nome"
                                         + " from tb_pessoa p "
-                                        + " where p.cpf = ? and p.senha = ? ");
+                                        + " where p.cpf = ? and p.senha = ? and tipo = 'F'");
                         
             ps.setString(1, cpf);
             ps.setString(2, senha);

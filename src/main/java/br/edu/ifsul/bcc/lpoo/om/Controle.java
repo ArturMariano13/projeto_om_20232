@@ -4,6 +4,7 @@ import br.edu.ifsul.bcc.lpoo.om.gui.JFramePrincipal;
 import br.edu.ifsul.bcc.lpoo.om.gui.JMenuBarHome;
 import br.edu.ifsul.bcc.lpoo.om.gui.JPanelHome;
 import br.edu.ifsul.bcc.lpoo.om.gui.autenticacao.JPanelAutenticacao;
+import br.edu.ifsul.bcc.lpoo.om.gui.funcionario.JPanelFuncionario;
 import br.edu.ifsul.bcc.lpoo.om.model.Funcionario;
 import br.edu.ifsul.bcc.lpoo.om.model.dao.PersistenciaJDBC;
 import javax.swing.JOptionPane;
@@ -18,7 +19,7 @@ public class Controle {
     private PersistenciaJDBC conexaoJDBC;
     private JFramePrincipal jframe;
     private JPanelAutenticacao telaAutenticacao;
-    //private JPanelAFuncionario telaFuncionario;
+    private JPanelFuncionario telaFuncionario;
     private JMenuBarHome menuBar;
     private JPanelHome  telaHome;
     
@@ -53,13 +54,13 @@ public class Controle {
         
         telaHome = new JPanelHome(this);
         
-        //telaFuncionario = new JPanelAFuncionario(this);
+        telaFuncionario = new JPanelFuncionario(this);
         
         jframe.addTela(telaAutenticacao, "tela_autenticacao"); //adiciona
         
         jframe.addTela(telaHome, "tela_home"); //adiciona
         
-        //jframe.addTela(telaFuncionario, "tela_funcionario");
+        jframe.addTela(telaFuncionario, "tela_funcionario");
         
         jframe.showTela("tela_autenticacao");   //mostra
         
@@ -95,7 +96,7 @@ public class Controle {
         
         if(nomeTela.equals("tela_funcionario")){
              
-            //telaFuncionario.showTela("tela_funcionario_listagem");
+            telaFuncionario.showTela("tela_funcionario_listagem");
             
             
         }
