@@ -4,6 +4,8 @@ import br.edu.ifsul.bcc.lpoo.om.Controle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -21,7 +23,8 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
 
     private JMenu menuCadastro;
     private JMenuItem menuItemFuncionario;    
-    private JMenuItem menuItemFuncionarioDesigner;   
+    //private JMenuItem menuItemFuncionarioDesigner;   
+    private JMenuItem menuItemPeca;
 
     private Controle controle;
     
@@ -66,16 +69,14 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
 
         menuItemFuncionario.addActionListener(this);
         menuItemFuncionario.setActionCommand("menu_funcionario");
-        menuCadastro.add(menuItemFuncionario);  
+        menuCadastro.add(menuItemFuncionario);    
         
-        menuItemFuncionarioDesigner = new JMenuItem("Funcionario (Designer)");
-        menuItemFuncionarioDesigner.setToolTipText("Funcionario (Designer)"); //acessibilidade
-        menuItemFuncionarioDesigner.setFocusable(true); //acessibilidade
-        
-                   
-        menuItemFuncionarioDesigner.addActionListener(this);
-        menuItemFuncionarioDesigner.setActionCommand("menu_funcionario_designer");
-        menuCadastro.add(menuItemFuncionarioDesigner);              
+        menuItemPeca = new JMenuItem("Peça");
+        menuItemPeca.setToolTipText("Peça"); // acessbilidade
+        menuItemPeca.setFocusable(true);
+        menuItemPeca.addActionListener(this);
+        menuItemPeca.setActionCommand("menu_peca");
+        menuCadastro.add(menuItemPeca);
 
         this.add(menuArquivo);
         this.add(menuCadastro);
@@ -96,16 +97,24 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
             
         }else if(e.getActionCommand().equals(menuItemFuncionario.getActionCommand())){
             
-                        //se o usuario clicou no menuitem Usuario            
-                        controle.showTela("tela_funcionario");          
+            try {
+                //se o usuario clicou no menuitem Usuario
+                controle.showTela("tela_funcionario");
+            } catch (Exception ex) {
+                Logger.getLogger(JMenuBarHome.class.getName()).log(Level.SEVERE, null, ex);
+            }
                         
         }else if(e.getActionCommand().equals(menuItemLogout.getActionCommand())){
             
                         //->controle.showTela("tela_autenticacao");    
                         
-        }else if(e.getActionCommand().equals(menuItemFuncionarioDesigner.getActionCommand())){
+        }else if(e.getActionCommand().equals(menuItemPeca.getActionCommand())){
             
-                        //controle.showTela("tela_jogador_designer");
+            try {
+                controle.showTela("tela_peca");
+            } catch (Exception ex) {
+                Logger.getLogger(JMenuBarHome.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         
