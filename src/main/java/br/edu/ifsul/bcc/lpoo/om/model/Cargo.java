@@ -67,6 +67,10 @@ public class Cargo implements Serializable{
         this.descricao = descricao;
     }
     
+    @Override
+    public String toString(){
+        return this.getDescricao();
+    }
     
     
     

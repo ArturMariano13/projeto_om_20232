@@ -36,15 +36,15 @@ public class JPanelFuncionario extends JPanel{
                 
     }
     
-    public void showTela(String nomeTela){
+    public void showTela(String nomeTela) throws Exception{
         
         if(nomeTela.equals("tela_funcionario_listagem")){
             
-            //listagem.populaTable();
+            listagem.populaTabela();
             
         }else if(nomeTela.equals("tela_funcionario_formulario")){
             
-            //getFormulario().populaComboCargo();
+            getFormulario().populaComboCargo();
             
         }
         

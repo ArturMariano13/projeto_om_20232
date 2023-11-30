@@ -90,7 +90,7 @@ public class Controle {
         }
     }
     
-    public void showTela(String nomeTela){
+    public void showTela(String nomeTela) throws Exception{
          
         //para cada nova tela de CRUD adicionar um elseif
         
