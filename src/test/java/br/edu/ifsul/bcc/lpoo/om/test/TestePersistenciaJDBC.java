@@ -17,10 +17,12 @@ import br.edu.ifsul.bcc.lpoo.om.model.dao.PersistenciaJPA;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import org.junit.Test;
 
 /**
@@ -209,7 +211,7 @@ public class TestePersistenciaJDBC {
             func.setCpf("1233");
             o.setFuncionario(func);
             MaoObra m = new MaoObra();
-            m.setId("1");
+            m.setId(1);
             Collection<MaoObra> maos = new ArrayList();
             maos.add(m);
             o.setMaoobras(maos);
@@ -280,7 +282,7 @@ public class TestePersistenciaJDBC {
 
     // PRIMEIRO REGISTRA OS VEÍCULOS NO TESTJPA
     // DEPOIS EXECUTA ESSA FUNÇÃO
-    @Test
+    //@Test
     public void testRecuperaClientesVeiculos() throws Exception {
         Collection<Cliente> clientes = null;
         PersistenciaJDBC jdbc = new PersistenciaJDBC();
@@ -359,6 +361,40 @@ public class TestePersistenciaJDBC {
 
         }
 
+    }
+    
+    @Test
+    public void testPersistenciaMaoObraJDBC() throws Exception {
+        //criar um objeto do tipo PersistenciaJPA.
+        PersistenciaJDBC jdbc = new PersistenciaJDBC();
+        if(jdbc.conexaoAberta()){
+            
+            //Passo 1: encontrar o cargo id = 1
+            List<MaoObra>  list=  (ArrayList) jdbc.listMaoObras("ote");
+            if(list != null && !list.isEmpty()){
+                for(MaoObra m : list){
+                    System.out.println("MaoObra: "+m.getId() + " removendo ...");
+                    m.setDescricao("alterado");
+                    jdbc.persist(m);
+                    jdbc.remover(m);
+                                      
+                }
+            }else{
+                 System.out.println("Não encontrou o cargo, criando um novo ...");
+                 MaoObra mb = new MaoObra();
+                 mb.setDescricao("teste");
+                 mb.setValor(100f);
+                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");                
+                 mb.setTempo_estimado_execucao(sdf.parse("2:30"));
+                 jdbc.persist(mb);
+                 
+            }
+        }else{
+            System.out.println("nao conectou no BD via jdbc ...");
+            //atribuir uma instancia para o cg
+            //setar a descricao
+            //persistir no banco de dados.
+        }
     }
 }
 

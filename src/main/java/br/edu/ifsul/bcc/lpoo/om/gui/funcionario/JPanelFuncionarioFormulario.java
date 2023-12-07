@@ -87,91 +87,53 @@ public class JPanelFuncionarioFormulario extends JPanel implements ActionListene
         model.addAll(controle.getConexaoJDBC().listCargos());   // adiciona todos os cargos
     }
 
-    public Funcionario getFuncionariobyFormulario() {
-        //validacao do formulario
-        if (txfCPF.getText().trim().length() == 11
-                && txfNome.getText().trim().length() > 0
-                && new String(psfSenha.getPassword()).trim().length() > 3
-                && txfNumero_ctps.getText().trim().length() > 3
-                && cbxCargo.getSelectedIndex() > 0) {
-
-            Funcionario f = new Funcionario();
-            f.setCpf(txfCPF.getText().trim());
-            f.setSenha(new String(psfSenha.getPassword()).trim());
-            f.setCargo((Cargo) cbxCargo.getSelectedItem());
-            f.setNumero_ctps(txfNumero_ctps.getText().trim());
-            f.setNome(txfNome.getText().trim());
-            //f.setData_admmissao((Calendar)null);
+    public Funcionario getFuncionarioFormulario(){
+        
+        if(txfCPF.getText().trim().length() == 11 &&
+           txfNome.getText().trim().length() > 0  &&
+           new String(psfSenha.getPassword()).trim().length() > 3 &&
+           txfNumero_ctps.getText().trim().length() > 3 &&
+           cbxCargo.getSelectedIndex() > 0){
             
-            /*if (txfDataAdmissao.getText().trim().length() > 0) {
-                try {
-                    // Cria uma instância do SimpleDateFormat com o padrão desejado
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-                    // Converte a string de data para um objeto Date
-                    Date dataAdmissao = dateFormat.parse(txfDataAdmissao.getText().trim());
-
-                    // Cria um objeto Calendar e configura a data de admissão nele
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(dataAdmissao);
-
-                    // Configura a data de admissão no objeto f
-                    f.setData_admmissao(calendar);
-
-                } catch (ParseException e) {
-                    // Trate a exceção se a string de data não estiver no formato esperado
-                    e.printStackTrace();
+            Funcionario f = new Funcionario();
+                f.setCpf(txfCPF.getText().trim());
+                f.setNome(txfNome.getText().trim());
+                f.setSenha(new String(psfSenha.getPassword()).trim());
+                f.setNumero_ctps(txfNumero_ctps.getText().trim());
+                f.setCargo((Cargo) cbxCargo.getSelectedItem());
+                if(txfDataAdmissao.getText().trim().length() > 0){
+                    f.setData_admmissao(txfDataAdmissao.getText().trim());
                 }
-            }*/
-            if (txfDataNascimento.getText().trim().length() > 0) {
-                try {
-                    // Cria uma instância do SimpleDateFormat com o padrão desejado
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-                    // Converte a string de data para um objeto Date
-                    Date dataNascimento = dateFormat.parse(txfDataNascimento.getText().trim());
-
-                    // Cria um objeto Calendar e configura a data de admissão nele
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(dataNascimento);
-
-                    // Configura a data de admissão no objeto f
-                    f.setData_nascimento(calendar);
-
-                } catch (ParseException e) {
-                    // Trate a exceção se a string de data não estiver no formato esperado
-                    e.printStackTrace();
+                if(txfDataNascimento.getText().trim().length() > 0){
+                    f.setData_nascimento(txfDataNascimento.getText().trim());
                 }
-            }
-
+                
             return f;
+                
         }
+        
         return null;
     }
-
-    public void setFuncionarioFormulario(Funcionario f) {
-        if (f == null) {//se o parametro estiver nulo, limpa o formulario
+    
+    public void setFuncionarioFormulario(Funcionario f){
+        if(f == null){
             txfCPF.setText("");
             txfNome.setText("");
             psfSenha.setText("");
             txfNumero_ctps.setText("");
-            Calendar c = Calendar.getInstance();
-            txfDataAdmissao.setText((String)format.format(c.getTime()));
-            txfDataAdmissao.setEditable(false);
+            txfDataAdmissao.setText("");
             txfDataNascimento.setText("");
             cbxCargo.setSelectedIndex(0);
-        } else {
+        }else{
             txfCPF.setText(f.getCpf());
-            txfCPF.setEditable(false);
             txfNome.setText(f.getNome());
             psfSenha.setText(f.getSenha());
             txfNumero_ctps.setText(f.getNumero_ctps());
-            txfDataAdmissao.setText(format.format(f.getData_admmissao().getTime()));
-            txfDataAdmissao.setEditable(false);
-            txfDataNascimento.setText(format.format(f.getData_admmissao().getTime()));
-            cbxCargo.getModel().setSelectedItem(f.getCargo());//aqui chama o método equals do classe Endereco
+            txfDataNascimento.setText(f.getData_nascimento_string());
+            txfDataAdmissao.setText(f.getData_admmissao_string());
+            cbxCargo.setSelectedItem(f.getCargo());
+                    
         }
-
     }
 
     private void initComponents() {
@@ -329,7 +291,7 @@ public class JPanelFuncionarioFormulario extends JPanel implements ActionListene
 
         if (ae.getActionCommand().equals(btnSalvar.getActionCommand())) {
 
-            Funcionario f = getFuncionariobyFormulario();//recupera os dados do formulario
+            Funcionario f = getFuncionarioFormulario();//recupera os dados do formulario
 
             if (f != null) {
 

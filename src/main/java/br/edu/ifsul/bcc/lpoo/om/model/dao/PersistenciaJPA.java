@@ -5,6 +5,8 @@ package br.edu.ifsul.bcc.lpoo.om.model.dao;
 import br.edu.ifsul.bcc.lpoo.om.model.Cargo;
 import br.edu.ifsul.bcc.lpoo.om.model.Cliente;
 import br.edu.ifsul.bcc.lpoo.om.model.Funcionario;
+import br.edu.ifsul.bcc.lpoo.om.model.MaoObra;
+import br.edu.ifsul.bcc.lpoo.om.model.Servico;
 import java.util.Collection;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
@@ -81,6 +83,16 @@ public class PersistenciaJPA implements InterfacePersistencia{
 
     @Override
     public Funcionario doLogin(String cpf, String senha) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public Collection<Servico> listServico() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    @Override
+    public Collection<MaoObra> listMaoObras(String filtro_descricao) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
