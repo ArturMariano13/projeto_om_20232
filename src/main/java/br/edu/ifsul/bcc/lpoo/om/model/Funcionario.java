@@ -1,6 +1,7 @@
 
 package br.edu.ifsul.bcc.lpoo.om.model;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  *
@@ -46,9 +48,13 @@ public class Funcionario extends Pessoa {
   
     private Collection<Curso> cursos;
     
+    @Transient
+    private SimpleDateFormat sdf;
+    
 
     public Funcionario() {
         cursos = new ArrayList();
+        sdf = new SimpleDateFormat("dd/MM/yyyy");
     }
 
     public Cargo getCargo() {
@@ -85,9 +91,33 @@ public class Funcionario extends Pessoa {
     public Calendar getData_admmissao() {
         return data_admmissao;
     }
-
+    
+    public String getData_admmissao_string() {
+        if(this.data_admmissao != null){
+            return this.data_admmissao.get(Calendar.DAY_OF_MONTH) + "/"+
+                   (this.data_admmissao.get(Calendar.MONTH) + 1) + "/"+
+                   this.data_admmissao.get(Calendar.YEAR); 
+        }else{
+            return "";
+        }
+        
+    }
+    
     public void setData_admmissao(Calendar data_admmissao) {
         this.data_admmissao = data_admmissao;
+    }
+
+    public void setData_admmissao(String data_admmissao){
+        
+        try{
+             this.data_admmissao = Calendar.getInstance();
+             this.data_admmissao.setTimeInMillis(sdf.parse(data_admmissao).getTime());
+            
+        }catch(Exception e){
+            
+            this.data_admmissao = null;
+        }
+                
     }
 
     public Calendar getData_demissao() {
@@ -98,9 +128,20 @@ public class Funcionario extends Pessoa {
         this.data_demissao = data_demissao;
     }
     
+    public void setData_demissao(String data_demissao) {
+        try{
+             this.data_demissao = Calendar.getInstance();
+             this.data_demissao.setTimeInMillis(sdf.parse(data_demissao).getTime());
+            
+        }catch(Exception e){
+            
+            this.data_demissao = null;
+        }
+       
+    }
+    
     @Override
     public String toString(){
         return this.getCpf();
-    }
-    
+    }  
 }

@@ -68,5 +68,10 @@ public class Peca implements Serializable {
         this.fornecedor = fornecedor;
     }
     
+    @Override
+    public String toString(){
+        return this.getId().toString();
+    }
+    
     
 }

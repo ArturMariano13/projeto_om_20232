@@ -19,13 +19,12 @@ public class ProjetoOM_LPOO_20232 {
                 controle.initComponents();
             } else {
 
-                JOptionPane.showMessageDialog(null, "Não conectou no BD!",
+                JOptionPane.showMessageDialog(null, "Não conectou no Banco de Dados!",
                         " Banco de Dados", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Erro ao conectar no BD! " +
-                    "Banco de Dados: " + ex.getLocalizedMessage(),
-                    "Banco de Dados", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erro ao conectar no Banco de Dados:" +
+                    ex.getLocalizedMessage(),"Banco de Dados", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
 

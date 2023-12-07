@@ -1,8 +1,11 @@
 package br.edu.ifsul.bcc.lpoo.om.gui.peca;
 
 import br.edu.ifsul.bcc.lpoo.om.Controle;
+import br.edu.ifsul.bcc.lpoo.om.model.Peca;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -53,6 +56,11 @@ public class JPanelPecaListagem extends javax.swing.JPanel {
         pnlNorte.add(txfFiltro);
 
         btnFiltro.setText("Filtrar");
+        btnFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFiltroActionPerformed(evt);
+            }
+        });
         pnlNorte.add(btnFiltro);
 
         add(pnlNorte, java.awt.BorderLayout.PAGE_START);
@@ -117,6 +125,37 @@ public class JPanelPecaListagem extends javax.swing.JPanel {
         
     }//GEN-LAST:event_btnNovoActionPerformed
 
+    private void btnFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltroActionPerformed
+        // TODO add your handling code here:
+        String filtro = txfFiltro.getText().trim();
+        
+        try {
+            populaTabela(filtro);
+        } catch (Exception ex) {
+            System.out.println("Erro");
+            Logger.getLogger(JPanelPecaListagem.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnFiltroActionPerformed
+
+    
+    public void populaTabela(String filtro) throws Exception{
+        DefaultTableModel model = (DefaultTableModel) tblListagem.getModel();//recuperacao do modelo da tabela
+
+        model.setRowCount(0);//elimina as linhas existentes (reset na tabela)
+
+        Collection<Peca> listPecas =  controle.getConexaoJDBC().listPecas(filtro);
+        
+        if (listPecas != null){
+            for(Peca p : listPecas){
+                                
+                model.addRow(new Object[]{p,    // chame o toString                                      
+                                    p.getNome(),
+                                    p.getValor(),
+                                    p.getFornecedor()});
+            }
+        }
+         
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEditar;

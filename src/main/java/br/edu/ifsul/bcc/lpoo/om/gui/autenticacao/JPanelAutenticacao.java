@@ -145,7 +145,7 @@ public class JPanelAutenticacao extends JPanel implements ActionListener{
             }else{
 
                 JOptionPane.showMessageDialog(this, "Informe CPf com 11 dígitos", "Autenticação", JOptionPane.ERROR_MESSAGE);                    
-                txfCPF.setBorder(new LineBorder(Color.red,1));
+                txfCPF.setBorder(new LineBorder(new Color(255,0,0)));
                 txfCPF.requestFocus();
             }
                                       

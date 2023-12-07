@@ -30,7 +30,7 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
     private final String DRIVER = "org.postgresql.Driver";
     private final String USER = "postgres";
-    private final String SENHA = "postgres";
+    private final String SENHA = "Artur#13";
     public static final String URL = "jdbc:postgresql://localhost:5432/db_om_lpoo_20232";
     private Connection con = null;
 
@@ -83,7 +83,7 @@ public class PersistenciaJDBC implements InterfacePersistencia {
 
                 funcionario = new Funcionario();
                 funcionario.setCpf(rs.getString("cpf"));  
-                //...recupera demais campos do ResultSet
+                funcionario.setNome(rs.getString("nome"));
             }
             ps.close();
             
@@ -477,59 +477,64 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                 }
             }
 
-        } else if (o instanceof Funcionario) {
+        }else if(o instanceof Funcionario){
+            
+              Funcionario func = (Funcionario) o;
+              
+               //verificar a acao: insert ou update.
+              if(func.getData_admmissao() == null){
+                  
+                  //insert tb_pessoa
+                  PreparedStatement ps = 
+                          this.con.prepareStatement("insert into tb_pessoa (  nome, "
+                                                                            + "senha, "
+                                                                            + "cpf, "
+                                                                            + "data_nascimento, tipo) values "
+                                                                            + "( "
+                                                                            + "?, "
+                                                                            + "?, "
+                                                                            + "?, "
+                                                                            + "?, "
+                                                                            + "'F') ");
+                  
+                  ps.setString(1, func.getNome());
+                  ps.setString(2, func.getSenha());
+                  ps.setString(3, func.getCpf());
+                  if(func.getData_nascimento() != null){
+                    ps.setDate(4, new java.sql.Date(func.getData_nascimento().getTimeInMillis()));
+                  }else{
+                      ps.setDate(4, null);
+                  }
+                  //demais campos...
+                
+                  ps.execute();
+                  
+                  ps.close();
 
-            Funcionario func = (Funcionario) o;
+                  //insert em tb_funcionario
+                  PreparedStatement ps2 = 
+                      this.con.prepareStatement("insert into tb_funcionario (numero_ctps, cpf, data_admmissao, cargo_id) values (?, ?, now(), ?) returning data_admmissao"); 
+                      ps2.setString(1, func.getNumero_ctps());
+                      ps2.setString(2, func.getCpf());
+                      ps2.setInt(3, func.getCargo().getId());
+                      
 
-            //verificar a acao: insert ou update.
-            if (func.getData_admmissao() == null) {
-                //insert tb_pessoa
-                PreparedStatement ps
-                        = this.con.prepareStatement("insert into tb_pessoa (tipo,cpf,data_nascimento,nome,senha) values "
-                                + "('F',?,?,?,?)");
+                  ResultSet rs2 = ps2.executeQuery();
+                  if(rs2.next()){
+                      
+                        Calendar dt_adm = Calendar.getInstance();
+                        dt_adm.setTimeInMillis(rs2.getDate("data_admmissao").getTime());
+                        func.setData_admmissao(dt_adm);
+                  
+                        //se necessário o insert em tb_funcionario_curso
+                        if (func.getCursos() != null && !func.getCursos().isEmpty()){
 
-                ps.setString(1, func.getCpf());
-                try {
-                    ps.setDate(2, new java.sql.Date(func.getData_nascimento().getTimeInMillis()));
-                } catch (Exception e) {
-                    ps.setDate(2, null);
-                }
-                ps.setString(3, func.getNome());
-                ps.setString(4, func.getSenha());
-
-                //demais campos...
-                ps.execute();
-
-                ps.close();
-
-                //insert em tb_funcionario
-                PreparedStatement ps2
-                        = this.con.prepareStatement("insert into tb_funcionario values "
-                                + "(now(), null, ?, ?, ?) returning data_admmissao");
-                ps2.setString(1, func.getNumero_ctps());
-                ps2.setString(2, func.getCpf());
-                ps2.setInt(3, func.getCargo().getId());
-                //setar os parametros...
-
-                ResultSet rs2 = ps2.executeQuery();
-                System.out.println("passou2");
-
-                if (rs2.next()) {
-
-                    Calendar dt_adm = Calendar.getInstance();
-                    dt_adm.setTimeInMillis(rs2.getDate("data_admmissao").getTime());
-                    func.setData_admmissao(dt_adm);
-
-                    //se necessário o insert em tb_funcionario_curso
-                    if (func.getCursos() != null) {
-                        if (!func.getCursos().isEmpty()) {
-
-                            for (Curso crs : func.getCursos()) {
+                            for(Curso crs : func.getCursos()){
 
                                 PreparedStatement ps3 = this.con.prepareStatement("insert into tb_funcionario_curso "
-                                        + "(funcionario_cpf, curso_id) "
-                                        + "values "
-                                        + "(?, ?)");
+                                                                                + "(funcionario_cpf, curso_id) "
+                                                                                + "values "
+                                                                                + "(?, ?)");
                                 ps3.setString(1, func.getCpf());
                                 ps3.setInt(2, crs.getId());
 
@@ -538,80 +543,69 @@ public class PersistenciaJDBC implements InterfacePersistencia {
                             }
 
                         }
+
+
                     }
-                }
-                ps2.close();
 
-            } else {
-
-                //update tb_pessoa.
-                PreparedStatement ps
-                        = this.con.prepareStatement("update tb_pessoa set cep = ?, "
-                                + "complemento = ?, "
-                                + "data_nascimento = ?, "
-                                + "nome = ?, "
-                                + "numero = ?, "
-                                + "senha = ?"
-                                + " where cpf = ? ");
-                //setar os demais campos e parametros.
-
-                ps.setString(1, func.getCep());
-                ps.setString(2, func.getComplemento());
-                ps.setDate(3, new java.sql.Date(func.getData_nascimento().getTimeInMillis()));
-                ps.setString(4, func.getNome());
-                ps.setString(5, func.getNumero());
-                ps.setString(6, func.getSenha());
-                ps.setString(7, func.getCpf());
-
-                ps.execute();
-                ps.close();
-
-                //update tb_funcionario.
-                PreparedStatement ps2
-                        = this.con.prepareStatement("update tb_funcionario set data_demissao = ?, "
-                                + "numero_ctps = ?, "
-                                + "cargo_id = ?"
-                                + "where cpf = ? ");
-                //setar os demais campos e parametros.
-
-                ps2.setDate(1, new java.sql.Date(func.getData_demissao().getTimeInMillis()));
-                ps2.setString(2, func.getNumero_ctps());
-                ps2.setInt(3, func.getCargo().getId());
-                ps2.setString(4, func.getCpf());
-
-                ps2.execute();
-                ps2.close();
-
-                //atualizar os respectivos registros em tb_funcionario_curso para o func
-                //passo 1 - remove todos os cursos do funcionario na tabela associativa 
-                PreparedStatement ps3
-                        = this.con.prepareStatement("delete from tb_funcionario_curso where funcionario_cpf = ?");
-
-                ps3.setString(1, func.getCpf());
-                ps3.execute();
-                ps3.close();
-
-                //passo 2: insere novamente, caso necessario. 
-                if (func.getCursos() != null) {
-                    if (!func.getCursos().isEmpty()) {
-
-                        for (Curso crs : func.getCursos()) {
-
-                            PreparedStatement ps4 = this.con.prepareStatement("insert into tb_funcionario_curso "
-                                    + "(funcionario_cpf, curso_id) "
-                                    + "values "
-                                    + "(?, ?)");
-                            ps4.setString(1, func.getCpf());
-                            ps4.setInt(2, crs.getId());
-
-                            ps4.execute();
-                            ps4.close();
+                  
+              }else{
+                  
+                    //update tb_pessoa.
+                    PreparedStatement ps = 
+                          this.con.prepareStatement("update tb_pessoa set nome = ?, senha = ?, data_nascimento = ? where cpf = ? ");
+                    //setar os demais campos e parametros.
+                    ps.setString(1, func.getNome());
+                    ps.setString(2, func.getSenha());
+                    if(func.getData_nascimento() != null){
+                      ps.setDate(3, new java.sql.Date(func.getData_nascimento().getTimeInMillis()));                    
+                    }else{
+                      ps.setDate(3, null);  
+                    }
+                    ps.setString(4, func.getCpf());
+                    
+                    ps.execute();
+                  
+                    //update tb_funcionario.
+                    PreparedStatement ps2 = 
+                          this.con.prepareStatement("update tb_funcionario set numero_ctps = ?, cargo_id = ? where cpf = ? ");
+                    //setar os demais campos e parametros.
+                    ps2.setString(1, func.getNumero_ctps());
+                    ps2.setInt(2, func.getCargo().getId());
+                    ps2.setString(3, func.getCpf()); 
+                    
+                    ps2.execute();
+                    //atualizar os respectivos registros em tb_funcionario_curso para o func
+                   
+                     //passo 1 - remove todos os cursos do funcionario na tabela associativa 
+                     PreparedStatement ps3 = 
+                          this.con.prepareStatement("delete from tb_funcionario_curso where funcionario_cpf = ?");
+                          ps3.setString(1, func.getCpf());
+                     ps3.execute();
+                     
+                    //passo 2: insere novamente, caso necessario. 
+                    if (func.getCursos() != null && !func.getCursos().isEmpty()){
+                            
+                            for(Curso crs : func.getCursos()){
+                                
+                                PreparedStatement ps4 = this.con.prepareStatement("insert into tb_funcionario_curso "
+                                                                                + "(funcionario_cpf, curso_id) "
+                                                                                + "values "
+                                                                                + "(?, ?)");
+                                ps4.setString(1, func.getCpf());
+                                ps4.setInt(2, crs.getId());
+                                
+                                ps4.execute();
+                                ps4.close();
+                            }
+                            
                         }
-
-                    }
-                }
-            }
-
+                   
+                     
+                    
+                    
+              }     
+             
+            
         } else if (o instanceof MaoObra) {
             MaoObra mao = (MaoObra) o;
 
@@ -1023,13 +1017,17 @@ public class PersistenciaJDBC implements InterfacePersistencia {
             ps.setString(1, func.getCpf());     // seta o valor para '?'
             ps.execute();       // executa
             ps.close();         // fecha o cursor
-
-            ps = this.con.prepareStatement("delete from tb_orcamento where "
-                    + "funcionario_cpf = ?");
+            
+            ps = this.con.prepareStatement("select id from tb_orcamento where funcionario_cpf = ?");
             ps.setString(1, func.getCpf());
-            ps.execute();
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Orcamento or = new Orcamento();
+                or.setId(rs.getInt("id"));
+                this.remover(or);
+            }
             ps.close();
-
+            
             // remoção da tb_funcionario_curso
             ps = this.con.prepareStatement("delete from "
                     + "tb_funcionario_curso where funcionario_cpf = ?");
@@ -1183,53 +1181,53 @@ public class PersistenciaJDBC implements InterfacePersistencia {
     @Override
     public Collection<Funcionario> listFuncionarios() throws Exception {
         Collection<Funcionario> colecaoRetorno = null;
-
-        PreparedStatement ps = this.con.prepareStatement("select * from tb_pessoa where tipo = 'F'");
+        
+        PreparedStatement ps = this.con.prepareStatement("select p.nome, p.senha, p.cpf, p.data_nascimento, f.data_admmissao, f.numero_ctps, c.id, c.descricao from tb_pessoa p, "
+                                                                    + "tb_funcionario f left join tb_cargo c on (f.cargo_id=c.id) where p.cpf=f.cpf");        
         ResultSet rs = ps.executeQuery();//executa o sql e retorna
-
-        PreparedStatement ps3 = this.con.prepareStatement("select * from tb_funcionario");
-        ResultSet rs3 = ps3.executeQuery();
-
-        colecaoRetorno = new ArrayList();//inicializa a colecao
-
-        while (rs.next() && rs3.next()) {//percorre o ResultSet
-
-            Funcionario func = new Funcionario();//inicializa o Cargo
-            //func.setCargo();
-            func.setCep(rs.getString("cep"));
-            func.setComplemento(rs.getString("complemento"));
+        
+        colecaoRetorno = new ArrayList();//inicializa a collecao
+        
+        while(rs.next()){//percorre o ResultSet
+            
+            Funcionario func = new Funcionario();//inicializa
             func.setCpf(rs.getString("cpf"));
-            //func.setData_nascimento(data_nascimento); // AJUSTAR
             func.setNome(rs.getString("nome"));
-            func.setNumero(rs.getString("numero"));
             func.setSenha(rs.getString("senha"));
-            //func.setData_admmissao(rs3.getDate("data_admmissao"));    // AJUSTAR
-            func.setNumero_ctps(rs3.getString("numero_ctps"));
-
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(rs.getDate("data_admmissao").getTime());
+            func.setData_admmissao(c);
+            func.setNumero_ctps(rs.getString("numero_ctps"));
+            Cargo cg = new Cargo();
+            cg.setId(rs.getInt("id"));
+            cg.setDescricao(rs.getString("descricao"));
+            func.setCargo(cg);
+            if(rs.getDate("data_nascimento") != null){
+                Calendar ca = Calendar.getInstance();
+                ca.setTimeInMillis(rs.getDate("data_nascimento").getTime());
+                func.setData_nascimento(ca);
+            }
+            
             //seta as informações do rs
-            PreparedStatement ps2 = this.con.prepareStatement("select funcionario_cpf, curso_id from tb_funcionario_curso fc, tb_pessoa f, tb_curso c "
-                    + "where fc.funcionario_cpf = ?");
-            ps2.setString(1, rs.getString("cpf"));
-            ResultSet rs2 = ps2.executeQuery();//executa o sql e retorna
+            /*
+            PreparedStatement ps2 = this.con.prepareStatement("select ... from tb_funcionario_cur");
+            ResultSet rs2 = ps.executeQuery();//executa o sql e retorna
             Collection<Curso> colecaoCursos = new ArrayList();
-            while (rs2.next()) {
+            while(rs2.next()){
                 Curso crs = new Curso();
-                crs.setId(rs2.getInt("id"));
-                crs.setDescricao("descricao");
-
+                
                 colecaoCursos.add(crs);
             }
-
-            ps2.close();
-            ps3.close();
-
+            rs2.close();
+            
             func.setCursos(colecaoCursos);
-
+            */
+            
             colecaoRetorno.add(func);//adiciona na colecao
         }
-
+        
         ps.close();//fecha o cursor
-
+        
         return colecaoRetorno; //retorna a colecao.
     }
 
@@ -1292,6 +1290,40 @@ public class PersistenciaJDBC implements InterfacePersistencia {
             listaRetorno.add(cli);
 
         }
+
+        if (listaRetorno.isEmpty()) {
+            listaRetorno = null;
+        }
+
+        return listaRetorno;
+    }
+
+    public Collection<Peca> listPecas(String filtro) throws Exception {
+        Collection<Peca> listaRetorno = null;
+        listaRetorno = new ArrayList();
+            PreparedStatement ps;
+        if (filtro == ""){
+            ps = this.con.prepareStatement("select id, nome, valor, fornecedor from tb_peca");
+        }else{
+            ps = this.con.prepareStatement("select id, nome, valor, fornecedor from tb_peca"
+                    + " where nome like ?");
+            
+            ps.setString(1, "%" + filtro + "%");
+        }
+        
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+
+            Peca p = new Peca();
+            p.setId(rs.getInt("id"));
+            p.setNome(rs.getString("nome"));
+            p.setValor(rs.getFloat("valor"));
+            p.setFornecedor(rs.getString("fornecedor"));
+
+            listaRetorno.add(p);
+
+        }
+        ps.close();
 
         if (listaRetorno.isEmpty()) {
             listaRetorno = null;

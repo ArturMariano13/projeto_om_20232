@@ -27,7 +27,7 @@ public class JPanelPeca extends javax.swing.JPanel {
         
         if(nomeTela.equals("tela_peca_listagem")){
             
-            //listagem.populaTabela();
+            listagem.populaTabela("");
             
         }else if(nomeTela.equals("tela_peca_formulario")){
             

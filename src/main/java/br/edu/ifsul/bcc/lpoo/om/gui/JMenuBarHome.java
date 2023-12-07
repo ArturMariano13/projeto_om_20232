@@ -45,17 +45,16 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
         menuItemSair = new JMenuItem("Sair");
         menuItemSair.setToolTipText("Sair"); //acessibilidade
         menuItemSair.setFocusable(true);     //acessibilidade
+        menuItemSair.addActionListener(this);
+        menuItemSair.setActionCommand("menu_sair");
         
         menuItemLogout = new JMenuItem("Logout");
         menuItemLogout.setToolTipText("Logout"); //acessibilidade
         menuItemLogout.setFocusable(true);     //acessibilidade
-        
         menuItemLogout.addActionListener(this);
         menuItemLogout.setActionCommand("menu_logout");
+        
         menuArquivo.add(menuItemLogout);
-
-        menuItemSair.addActionListener(this);
-        menuItemSair.setActionCommand("menu_sair");
         menuArquivo.add(menuItemSair);
 
         menuCadastro = new JMenu("Cadastros");
@@ -66,16 +65,16 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
         menuItemFuncionario = new JMenuItem("Funcionário");
         menuItemFuncionario.setToolTipText("Funcionario"); //acessibilidade
         menuItemFuncionario.setFocusable(true); //acessibilidade
-
         menuItemFuncionario.addActionListener(this);
         menuItemFuncionario.setActionCommand("menu_funcionario");
-        menuCadastro.add(menuItemFuncionario);    
         
         menuItemPeca = new JMenuItem("Peça");
         menuItemPeca.setToolTipText("Peça"); // acessbilidade
         menuItemPeca.setFocusable(true);
         menuItemPeca.addActionListener(this);
         menuItemPeca.setActionCommand("menu_peca");
+        
+        menuCadastro.add(menuItemFuncionario);         
         menuCadastro.add(menuItemPeca);
 
         this.add(menuArquivo);
@@ -83,32 +82,36 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
     }
     
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ae) {
        
-        if(e.getActionCommand().equals(menuItemSair.getActionCommand())){
-        
-            //se o usuario clicou no menuitem Sair
-            int d = JOptionPane.showConfirmDialog(this, "Deseja realmente sair do sistema? ", "Sair", JOptionPane.YES_NO_OPTION);
-            if(d == 0){                
-                //->controle.fecharBD();//fecha a conexao com o banco de dados.
-                System.exit(0);//finaliza o processo do programa.
-            }
-            
-            
-        }else if(e.getActionCommand().equals(menuItemFuncionario.getActionCommand())){
+        if (ae.getActionCommand().equals(menuItemLogout.getActionCommand())){
             
             try {
-                //se o usuario clicou no menuitem Usuario
+                controle.showTela("tela_autenticacao");
+            } catch (Exception ex) {
+                Logger.getLogger(JMenuBarHome.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }else if(ae.getActionCommand().equals(menuItemSair.getActionCommand())){
+            //se o usuario clicou no menuitem Sair
+            int decisao = JOptionPane.showConfirmDialog(this, "Deseja realmente sair do sistema? ", "Sair", JOptionPane.YES_NO_OPTION);
+            if(decisao == 0){                
+                controle.getConexaoJDBC().fecharConexao();//fecha a conexao com o banco de dados.
+                System.exit(0);//finaliza o processo do programa.
+            }  
+        }else if(ae.getActionCommand().equals(menuItemFuncionario.getActionCommand())){
+            
+            try {
                 controle.showTela("tela_funcionario");
             } catch (Exception ex) {
                 Logger.getLogger(JMenuBarHome.class.getName()).log(Level.SEVERE, null, ex);
             }
                         
-        }else if(e.getActionCommand().equals(menuItemLogout.getActionCommand())){
+        }else if(ae.getActionCommand().equals(menuItemLogout.getActionCommand())){
             
                         //->controle.showTela("tela_autenticacao");    
                         
-        }else if(e.getActionCommand().equals(menuItemPeca.getActionCommand())){
+        }else if(ae.getActionCommand().equals(menuItemPeca.getActionCommand())){
             
             try {
                 controle.showTela("tela_peca");
@@ -116,8 +119,5 @@ public class JMenuBarHome extends JMenuBar implements ActionListener {
                 Logger.getLogger(JMenuBarHome.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        
-    }
-    
+    }  
 }
